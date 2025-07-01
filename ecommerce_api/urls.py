@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from ecommerce_api.views import client_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,4 +35,6 @@ urlpatterns = [
     # eventuali altre rotte
     path('api/users/', include('users.urls')),
     path('api/shop/', include('shop.urls')),
+
+    path('', client_view, name='client'),
 ]

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>E-commerce Client</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .product { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; margin: 5px; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>E-commerce API Client</h1>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h3>Login</h3>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+            <button onclick="showRegisterForm()">Register</button>
+            <hr>
+            <button onclick="showProductsNL()">View products as a Guest</button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" style="display:none;">
+            <h3>Register</h3>
+            <input type="text" id="reg_username" placeholder="Username">
+            <input type="email" id="reg_email" placeholder="Email">
+            <input type="password" id="reg_password" placeholder="Password">
+            <input type="password" id="reg_password2" placeholder="Confirm Password">
+            <hr>
+            <button onclick="register()">Submit Registration</button>
+            <button onclick="backToLogin()">Back to Login</button>
+        </div>
+
+        <!-- Products -->
+        <div id="productsSection" style="display:none;">
+            <h3>Products</h3>
+            <div id="products"></div>
+            <button onclick="viewCart()">View Cart</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Products (no login) -->
+        <div id="productsSectionNL" style="display:none;">
+            <h3>Products</h3>
+            <div id="productsNL"></div>
+            <button onclick="backToLogin()">Back to Login</button>
+        </div>
+
+        <!-- Cart -->
+        <div id="cartSection" style="display:none;">
+            <h3>Cart</h3>
+            <div id="cart"></div>
+            <button onclick="createOrder()">Create Order</button>
+            <button onclick="backToProducts()">Back to Products</button>
+        </div>
+
+    </div>
+
+    <script>
+    const API_BASE = 'http://127.0.0.1:8000/api';
+    let token = localStorage.getItem('token');
+
+    async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    console.log("Login attempt with username:", username); // debug
+
+    try {
+        const response = await fetch(`${API_BASE}/token/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        console.log("Response status:", response.status); // debug
+
+        const data = await response.json();
+
+        console.log("Response data:", data); // debug
+
+        if (response.ok) {
+            token = data.access;
+            localStorage.setItem('token', token);
+            showProducts();
+        } else {
+            alert('Login failed: ' + (data.detail || JSON.stringify(data)));
+        }
+    } catch (error) {
+        console.error('Login error:', error); // debug
+        alert('Login error: ' + error.message);
+    }
+    }
+
+    async function register() {
+        const username = document.getElementById('reg_username').value;
+        const email = document.getElementById('reg_email').value;
+        const password = document.getElementById('reg_password').value;
+        const password2 = document.getElementById('reg_password2').value;
+
+        if (password !== password2) {
+            alert("Passwords don't match");
+        return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/users/register/`, {
+              method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, email, password, password2 })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              alert("Registration successful! Please login.");
+              backToLogin();
+            } else {
+              alert('Registration failed: ' + JSON.stringify(data));
+            }
+        } catch (error) {
+            alert('Registration error: ' + error.message);
+        }
+    }
+
+
+    async function loadProducts() {
+        try {
+            // Modifica qui l'URL se serve, es: '/shop/products/'
+            const response = await fetch(`${API_BASE}/shop/products/`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                alert('Failed to load products');
+                return;
+            }
+
+            const products = await response.json();
+
+            const productsDiv = document.getElementById('products');
+            productsDiv.innerHTML = '';
+
+            // Se la risposta è una lista diretta
+            (Array.isArray(products) ? products : products.results).forEach(product => {
+                productsDiv.innerHTML += `
+                    <div class="product">
+                        <h4>${product.name}</h4>
+                        <p>${product.description}</p>
+                        <p>Price: $${product.price}</p>
+                        <p>Stock: ${product.quantity_available || product.stock_quantity || 0}</p>
+                        <button onclick="addToCart(${product.id})">Add to Cart</button>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            alert('Error loading products: ' + error.message);
+        }
+    }
+
+    async function loadProductsNL() {
+    try {
+        const response = await fetch(`${API_BASE}/shop/products/`);
+        if (!response.ok) {
+            alert('Failed to load products');
+            return;
+        }
+        const products = await response.json();
+        const productsDiv = document.getElementById('productsNL');
+        productsDiv.innerHTML = '';
+        (Array.isArray(products) ? products : products.results).forEach(product => {
+            productsDiv.innerHTML += `
+                <div class="product">
+                    <h4>${product.name}</h4>
+                    <p>${product.description}</p>
+                    <p>Price: $${product.price}</p>
+                    <p>Stock: ${product.quantity_available || 0}</p>
+                    <!-- Nessun pulsante Add to Cart qui -->
+                </div>
+            `;
+        });
+    } catch (error) {
+        alert('Error loading products: ' + error.message);
+    }
+}
+
+
+    // Funzioni showProducts, logout, ecc. rimangono come prima
+
+    function showProducts() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('productsSection').style.display = 'block';
+        loadProducts();
+    }
+
+    function showProductsNL() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('productsSectionNL').style.display = 'block';
+        loadProductsNL();
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        location.reload();
+    }
+
+    if (token) {
+        showProducts();
+    }
+
+    function showRegisterForm() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('productsSection').style.display = 'none';
+        document.getElementById('cartSection').style.display = 'none';
+    }
+
+    function backToLogin() {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('productsSectionNL').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

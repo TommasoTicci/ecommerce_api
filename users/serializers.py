@@ -1,7 +1,16 @@
 from rest_framework import serializers
 from .models import CustomUser
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(
+        label="Username"
+    )
+    email = serializers.EmailField(
+        label="Email"
+    )
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -13,12 +22,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         required=True,
         style={'input_type': 'password'},
         label="Confirm Password"
-    )
-    username = serializers.CharField(
-        label="Username"
-    )
-    email = serializers.EmailField(
-        label="Email"
     )
 
     class Meta:
@@ -40,3 +43,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'is_moderator')
+        read_only_fields = ('is_moderator',)
