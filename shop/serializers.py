@@ -1,5 +1,13 @@
 from rest_framework import serializers
 from .models import Product, Cart, CartItem, Order, OrderItem
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']  # i campi che vuoi mostrare
 
 class ProductSerializer(serializers.ModelSerializer):
     is_available = serializers.ReadOnlyField()
@@ -10,10 +18,12 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    user = UserSimpleSerializer(read_only=True)  # include i dati utente annidati
+
     class Meta:
         model = Order
         fields = '__all__'
-        read_only_fields = ('user', 'total_amount')
+        read_only_fields = ('user', 'amount')
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)

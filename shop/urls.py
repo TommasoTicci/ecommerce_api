@@ -6,25 +6,24 @@ from .views import (
     CartViewSet,
     OrderCreateView,
     OrderListAdminView,
+    UserOrderListView, OrderUpdateDeleteView,
 )
 
-# Router per CartViewSet
 router = DefaultRouter()
 router.register(r'cart', CartViewSet, basename='cart')
 
 urlpatterns = [
-    # ✅ Lista prodotti (GET per tutti)
     path('products/', ProductListView.as_view(), name='product-list'),
 
-    # ✅ CRUD prodotti per moderatori (POST, GET, PUT/PATCH, DELETE su singolo prodotto)
     path('products/<int:pk>/', ProductCreateUpdateDeleteView.as_view(), name='product-crud'),
 
-    # ✅ Creazione ordine (POST per utenti autenticati)
     path('orders/', OrderCreateView.as_view(), name='order-create'),
 
-    # ✅ Visualizzazione ordini per moderatori
     path('orders/admin/', OrderListAdminView.as_view(), name='admin-order-list'),
 
-    # ✅ CartViewSet gestito via router (CRUD carrello + add_item)
+    path('orders/user/', UserOrderListView.as_view(), name='user-order-list'),
+
+    path('orders/<int:pk>/', OrderUpdateDeleteView.as_view(), name='order-update-delete'),
+
     path('', include(router.urls)),
 ]

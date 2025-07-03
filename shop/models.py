@@ -16,6 +16,11 @@ class Product(models.Model):
     def is_available(self):
         return self.is_purchasable and self.quantity_available > 0
 
+    def get_discounted_price(self):
+        if self.is_discounted and self.discount:
+            return self.price * (1 - self.discount / 100)
+        return self.price
+
     def __str__(self):
         return self.name
 
