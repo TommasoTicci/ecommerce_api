@@ -726,8 +726,7 @@
             let itemsHtml = '';
             if (order.items) {
                 order.items.forEach(item => {
-                    const price = parseFloat(item.product.price);
-                    itemsHtml += `<li>${item.product.name} - Quantity: ${item.quantity} - Price: $${price.toFixed(2)}</li>`;
+                    itemsHtml += `<li>${item.product.name} - Quantity: ${item.quantity}</li>`;
                 });
             }
 
