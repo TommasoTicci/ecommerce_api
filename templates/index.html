@@ -726,7 +726,8 @@
             let itemsHtml = '';
             if (order.items) {
                 order.items.forEach(item => {
-                    itemsHtml += `<li>${item.product.name} - Quantity: ${item.quantity} - Price: $${item.product.price.toFixed(2)}</li>`;
+                    const price = parseFloat(item.product.price);
+                    itemsHtml += `<li>${item.product.name} - Quantity: ${item.quantity} - Price: $${price.toFixed(2)}</li>`;
                 });
             }
 
@@ -734,20 +735,21 @@
             orderDiv.className = 'order';
 
             orderDiv.innerHTML = `
-                <h4>Order #${order.id}</h4>
-                <p><strong>User:</strong> ${order.user.username || order.user.email || 'N/A'}</p>
-                <ul>${itemsHtml}</ul>
-                <label for="status-${order.id}"><strong>Status:</strong></label>
-                <select id="status-${order.id}">
-                    <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
-                    <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                    <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
-                    <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
-                    <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                </select>
-                <button onclick="updateOrderStatus(${order.id})">Update Status</button>
-                <button onclick="deleteOrder(${order.id})" style="background-color: red; color: white; margin-left: 5px;">Delete Order</button>
-                <hr>
+            <h4>Order #${order.id}</h4>
+            <p><strong>User:</strong> ${order.user.username || order.user.email || 'N/A'}</p>
+            <p><strong>Shipping Address:</strong> ${order.shipping_address}</p>
+            <ul>${itemsHtml}</ul>
+            <label for="status-${order.id}"><strong>Status:</strong></label>
+            <select id="status-${order.id}">
+                <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
+            <button onclick="updateOrderStatus(${order.id})">Update Status</button>
+            <button onclick="deleteOrder(${order.id})" style="background-color: red; color: white; margin-left: 5px;">Delete Order</button>
+            <hr>
             `;
 
             ordersAdminListDiv.appendChild(orderDiv);

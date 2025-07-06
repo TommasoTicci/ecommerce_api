@@ -89,6 +89,12 @@ class OrderCreateView(generics.CreateAPIView):
 
         for item in cart.items.all():
             product = item.product
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                quantity=item.quantity,
+                price=product.get_discounted_price()
+            )
             product.quantity_available -= item.quantity
             product.save()
 

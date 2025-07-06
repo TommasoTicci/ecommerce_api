@@ -16,9 +16,16 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'quantity']
 
 class OrderSerializer(serializers.ModelSerializer):
-    user = UserSimpleSerializer(read_only=True)  # include i dati utente annidati
+    user = UserSimpleSerializer(read_only=True)
+    items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
