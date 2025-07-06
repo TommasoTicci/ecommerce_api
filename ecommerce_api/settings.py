@@ -25,7 +25,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'unsafe-default-key-for-dev-only')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['ecommerceapi-production-8d69.up.railway.app']
+ALLOWED_HOSTS = ['ecommerceapi-production-8d69.up.railway.app', '127.0.0.1']
 
 
 # Application definition
