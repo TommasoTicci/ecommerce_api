@@ -12,6 +12,8 @@ The project runs live at:
 https://ecommerceapi-production-8d69.up.railway.app/
 ```
 
+_[ **Nota per il professore**: per testare un utente moderatore, utilizzare username TestModerator e come password la mia matricola (di Ticci Tommaso) ]_
+
 ---
 
 ## Local deployment
